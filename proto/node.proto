@@ -10,13 +10,18 @@ service TokenRing {
     rpc ReceiveToken(ReceiveMessageRequest) returns (AckMessage);
 }
 
+message Empty {
+
+}
+
 message ReceiveMessageRequest {
     oneof message {
         TokenMessage token = 1;
         RequestMessage request = 2;
         AckMessage ack = 3;
+        Empty empty = 4;
     }
-    int32 nodeid = 4;
+    int32 nodeid = 5;
 }
 
 message TokenMessage {
