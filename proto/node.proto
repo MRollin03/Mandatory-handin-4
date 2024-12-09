@@ -5,34 +5,12 @@ package proto;
 option go_package = "/pb";
 
 service TokenRing {
-    rpc PassTokenToNext(ReceiveMessageRequest) returns (AckMessage);
-    rpc RequestCriticalSection(ReceiveMessageRequest) returns (AckMessage);
-    rpc ReceiveToken(ReceiveMessageRequest) returns (AckMessage);
+    rpc PassTokenToNext(Token) returns (Token);
+    rpc RequestCriticalSection(Token) returns (Token);
+    rpc ReceiveToken(Token) returns (Token);
 }
 
-message Empty {
 
+message Token {
 }
 
-message ReceiveMessageRequest {
-    oneof message {
-        TokenMessage token = 1;
-        RequestMessage request = 2;
-        AckMessage ack = 3;
-        Empty empty = 4;
-    }
-    int32 nodeid = 5;
-}
-
-message TokenMessage {
-    int32 sender_id = 1;
-}
-
-message RequestMessage {
-    int32 nodeid = 1;
-}
-
-message AckMessage {
-    string message = 1;
-    int32 id = 2;
-}

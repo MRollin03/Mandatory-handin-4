@@ -63,7 +63,7 @@ func startServers(ctx context.Context) {
 }
 
 // ReceiveToken processes the token and allows a node to enter the critical section if requested.
-func (n *Node) ReceiveToken(ctx context.Context, req *pb.ReceiveMessageRequest) (*pb.AckMessage, error) {
+func (n *Node) ReceiveToken(ctx context.Context, req *pb.Token) (*pb.Token, error) {
 	log.Printf("Node %d has received the token", n.id)
 	n.hasToken = true;
 	time.Sleep(2 * time.Second);
@@ -79,7 +79,7 @@ func (n *Node) ReceiveToken(ctx context.Context, req *pb.ReceiveMessageRequest) 
 	// Pass the token to the next node
 	n.passToken()
 
-	return &pb.AckMessage{Message: "Token received and processed"}, nil
+	return &pb.Token{}, nil
 }
 
 // passToken sends the token to the next node in the ring.
@@ -99,7 +99,7 @@ func (n *Node) passToken() {
 		defer conn.Close()
 
 		client := pb.NewTokenRingClient(conn)
-		_, err = client.ReceiveToken(context.Background(), &pb.ReceiveMessageRequest{})
+		_, err = client.ReceiveToken(context.Background(), &pb.Token{})
 		if err != nil {
 			log.Printf("Failed to pass token: %v", err)
 			return
@@ -191,7 +191,6 @@ func gracefulShutdown() {
 func main() {
 	nodes = make([]*Node, numOfNodes)
 
-	// Create context to pass around
 	ctx := context.Background()
 
 	// Start servers for all nodes
@@ -200,6 +199,5 @@ func main() {
 	// Start handling user requests in a separate goroutine
 	go CommandlineInput()
 
-	// Wait for graceful shutdown signal
 	gracefulShutdown()
 }

@@ -28,9 +28,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TokenRingClient interface {
-	PassTokenToNext(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error)
-	RequestCriticalSection(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error)
-	ReceiveToken(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error)
+	PassTokenToNext(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
+	RequestCriticalSection(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
+	ReceiveToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
 }
 
 type tokenRingClient struct {
@@ -41,9 +41,9 @@ func NewTokenRingClient(cc grpc.ClientConnInterface) TokenRingClient {
 	return &tokenRingClient{cc}
 }
 
-func (c *tokenRingClient) PassTokenToNext(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error) {
+func (c *tokenRingClient) PassTokenToNext(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AckMessage)
+	out := new(Token)
 	err := c.cc.Invoke(ctx, TokenRing_PassTokenToNext_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,9 +51,9 @@ func (c *tokenRingClient) PassTokenToNext(ctx context.Context, in *ReceiveMessag
 	return out, nil
 }
 
-func (c *tokenRingClient) RequestCriticalSection(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error) {
+func (c *tokenRingClient) RequestCriticalSection(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AckMessage)
+	out := new(Token)
 	err := c.cc.Invoke(ctx, TokenRing_RequestCriticalSection_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -61,9 +61,9 @@ func (c *tokenRingClient) RequestCriticalSection(ctx context.Context, in *Receiv
 	return out, nil
 }
 
-func (c *tokenRingClient) ReceiveToken(ctx context.Context, in *ReceiveMessageRequest, opts ...grpc.CallOption) (*AckMessage, error) {
+func (c *tokenRingClient) ReceiveToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AckMessage)
+	out := new(Token)
 	err := c.cc.Invoke(ctx, TokenRing_ReceiveToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -75,9 +75,9 @@ func (c *tokenRingClient) ReceiveToken(ctx context.Context, in *ReceiveMessageRe
 // All implementations must embed UnimplementedTokenRingServer
 // for forward compatibility.
 type TokenRingServer interface {
-	PassTokenToNext(context.Context, *ReceiveMessageRequest) (*AckMessage, error)
-	RequestCriticalSection(context.Context, *ReceiveMessageRequest) (*AckMessage, error)
-	ReceiveToken(context.Context, *ReceiveMessageRequest) (*AckMessage, error)
+	PassTokenToNext(context.Context, *Token) (*Token, error)
+	RequestCriticalSection(context.Context, *Token) (*Token, error)
+	ReceiveToken(context.Context, *Token) (*Token, error)
 	mustEmbedUnimplementedTokenRingServer()
 }
 
@@ -88,13 +88,13 @@ type TokenRingServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTokenRingServer struct{}
 
-func (UnimplementedTokenRingServer) PassTokenToNext(context.Context, *ReceiveMessageRequest) (*AckMessage, error) {
+func (UnimplementedTokenRingServer) PassTokenToNext(context.Context, *Token) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PassTokenToNext not implemented")
 }
-func (UnimplementedTokenRingServer) RequestCriticalSection(context.Context, *ReceiveMessageRequest) (*AckMessage, error) {
+func (UnimplementedTokenRingServer) RequestCriticalSection(context.Context, *Token) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestCriticalSection not implemented")
 }
-func (UnimplementedTokenRingServer) ReceiveToken(context.Context, *ReceiveMessageRequest) (*AckMessage, error) {
+func (UnimplementedTokenRingServer) ReceiveToken(context.Context, *Token) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReceiveToken not implemented")
 }
 func (UnimplementedTokenRingServer) mustEmbedUnimplementedTokenRingServer() {}
@@ -119,7 +119,7 @@ func RegisterTokenRingServer(s grpc.ServiceRegistrar, srv TokenRingServer) {
 }
 
 func _TokenRing_PassTokenToNext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReceiveMessageRequest)
+	in := new(Token)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -131,13 +131,13 @@ func _TokenRing_PassTokenToNext_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: TokenRing_PassTokenToNext_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenRingServer).PassTokenToNext(ctx, req.(*ReceiveMessageRequest))
+		return srv.(TokenRingServer).PassTokenToNext(ctx, req.(*Token))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TokenRing_RequestCriticalSection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReceiveMessageRequest)
+	in := new(Token)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -149,13 +149,13 @@ func _TokenRing_RequestCriticalSection_Handler(srv interface{}, ctx context.Cont
 		FullMethod: TokenRing_RequestCriticalSection_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenRingServer).RequestCriticalSection(ctx, req.(*ReceiveMessageRequest))
+		return srv.(TokenRingServer).RequestCriticalSection(ctx, req.(*Token))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TokenRing_ReceiveToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReceiveMessageRequest)
+	in := new(Token)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func _TokenRing_ReceiveToken_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: TokenRing_ReceiveToken_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenRingServer).ReceiveToken(ctx, req.(*ReceiveMessageRequest))
+		return srv.(TokenRingServer).ReceiveToken(ctx, req.(*Token))
 	}
 	return interceptor(ctx, in, info, handler)
 }
